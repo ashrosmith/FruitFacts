@@ -104,8 +104,8 @@
 		3980C9BA289B181A00B6EC65 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				39FEC562289997AC000FCDDC /* FruitDataViewController.swift */,
 				39D113F8286A32F300C4BFCF /* FruitViewController.swift */,
+				39FEC562289997AC000FCDDC /* FruitDataViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";

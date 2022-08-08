@@ -11,6 +11,8 @@ class FruitDataViewController: UIViewController {
     
     public var fruitName = String()
     var fruitManager = FruitManager()
+ 
+//MARK: - UI Label Set Up
     
     lazy var fruitNameLabel: UILabel = {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
@@ -54,6 +56,7 @@ class FruitDataViewController: UIViewController {
         label.center = CGPoint(x: 160, y: 400)
         return label
     }()
+    
     lazy var backgroundImage: UIImageView = {
         let image = UIImageView(image: UIImage(named: "fruitBackground"))
         image.frame = view.bounds
@@ -61,6 +64,7 @@ class FruitDataViewController: UIViewController {
         image.alpha = 0.4
         return image
     }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(backgroundImage)
@@ -75,6 +79,8 @@ class FruitDataViewController: UIViewController {
         loadFruitInformation()
     }
     
+ //MARK: - Load Data Function
+    
     private func loadFruitInformation() {
         if let fruitName = fruitNameLabel.text {
             fruitManager.fetchData(fruitName: fruitName)
@@ -82,8 +88,11 @@ class FruitDataViewController: UIViewController {
     }
 }
 
+// MARK: - Fruit Manager Delegate
+
 extension FruitDataViewController: FruitManagerDelegate {
-    internal func didUpdateFruit(_fruitManager: FruitManager, fruit: FruitModel) {
+    
+    func didUpdateFruit(_fruitManager: FruitManager, fruit: FruitModel) {
         DispatchQueue.main.async {
             self.fruitNameLabel.text = String(fruit.name)
             self.fruitCaloriesLabel.text = "Calories: \(fruit.calories)"
@@ -95,9 +104,8 @@ extension FruitDataViewController: FruitManagerDelegate {
         }
     }
     
-    internal func didFailWithError(error: Error) {
+    func didFailWithError(error: Error) {
         print("error")
     }
-    
     
 }

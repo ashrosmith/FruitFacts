@@ -38,7 +38,6 @@ class FruitViewController: UIViewController {
             image.alpha = 0.4
         tableView.rowHeight = 80.0
         
-        
         loadFruit()
     }
     
@@ -46,6 +45,8 @@ class FruitViewController: UIViewController {
         super.viewDidLayoutSubviews()
         tableView.frame = CGRect(x: 0, y: 100, width: view.frame.width, height: view.frame.height - 100)
       }
+ 
+ //MARK: - Button functions
     
     func addButton() {
         button = UIButton(configuration: .filled())
@@ -67,13 +68,9 @@ class FruitViewController: UIViewController {
                     self.fruit.append(newFruit)
                     self.saveFruit()
                 }
-                
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
-                
             }
-            
-            
             alert.addTextField { (alertTextField) in
                 alertTextField.placeholder = "Enter New Fruit"
                 textField = alertTextField
@@ -84,6 +81,8 @@ class FruitViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
         }
     }
+    
+ //MARK: - Core Data
     
     func saveFruit(){
         do {
@@ -108,9 +107,8 @@ class FruitViewController: UIViewController {
     }
 }
 
+//MARK: - UI Table View Data Source
 
-
-//MARK: Table View Data Source
 extension FruitViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return fruit.count
@@ -125,12 +123,10 @@ extension FruitViewController: UITableViewDataSource {
     }
 }
 
-//MARK: Table View Delegate
+//MARK: - UI Table View Delegate
 
 extension FruitViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let fruit = fruit[indexPath.row].name
-        fruitManager.fetchData(fruitName: fruit!)
         DispatchQueue.main.async {
             self.performSegue(withIdentifier: "goToFruitDataVC", sender: self)
         }
