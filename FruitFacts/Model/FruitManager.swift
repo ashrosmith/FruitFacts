@@ -11,6 +11,7 @@ protocol FruitManagerDelegate {
     func didUpdateFruit(_fruitManager: FruitManager, fruit: FruitModel)
     func didFailWithError(error: Error)
 }
+
 public struct FruitManager {
     let fruitURL = "https://www.fruityvice.com/api/fruit"
     var delegate: FruitManagerDelegate?

@@ -10,7 +10,7 @@ import CoreData
 
 class FruitViewController: UIViewController {
 
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let context = (URLSession.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var fruit = [Fruit]()
     var safeArea: UILayoutGuide!
     let tableView = UITableView()
@@ -58,28 +58,26 @@ class FruitViewController: UIViewController {
     }
     
     @objc func buttonPressed(_ sender: UIButton) {
-        DispatchQueue.main.async {
-            var textField = UITextField()
-            let alert = UIAlertController(title: "Add New Fruit", message: "", preferredStyle: .alert)
-            let addAction = UIAlertAction(title: "Add Fruit", style: .default) { (action) in
-                if let entry = textField.text {
-                    let newFruit = Fruit(context: self.context)
-                    newFruit.name = entry
-                    self.fruit.append(newFruit)
-                    self.saveFruit()
-                }
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Add New Fruit", message: "", preferredStyle: .alert)
+        let addAction = UIAlertAction(title: "Add Fruit", style: .default) { (action) in
+            if let entry = textField.text {
+                let newFruit = Fruit(context: self.context)
+                newFruit.name = entry
+                self.fruit.append(newFruit)
+                self.saveFruit()
             }
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
-            }
-            alert.addTextField { (alertTextField) in
-                alertTextField.placeholder = "Enter New Fruit"
-                textField = alertTextField
-            }
-            
-            alert.addAction(addAction)
-            alert.addAction(cancelAction)
-            self.present(alert, animated: true, completion: nil)
         }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
+        }
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Enter New Fruit"
+            textField = alertTextField
+        }
+        
+        alert.addAction(addAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
     }
     
  //MARK: - Core Data
