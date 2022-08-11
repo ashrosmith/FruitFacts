@@ -10,7 +10,7 @@ import CoreData
 
 class FruitViewController: UIViewController {
 
-    let context = (URLSession.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var fruit = [Fruit]()
     var safeArea: UILayoutGuide!
     let tableView = UITableView()
