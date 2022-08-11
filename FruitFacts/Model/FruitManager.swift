@@ -26,7 +26,7 @@ public struct FruitManager {
         //1. create url
         if let url = URL(string: urlString){
             //2. create url session
-            let session = URLSession(configuration: .default)
+            let session = URLSession.shared
             
             //3. give session task
             let task = session.dataTask(with: url) { (data, response, error) in
