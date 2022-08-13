@@ -8,7 +8,7 @@
 import UIKit
 
 protocol FruitManagerDelegate {
-    func didUpdateFruit(_fruitManager: FruitManager, fruit: FruitModel)
+    func didUpdateFruit(_fruitManager: FruitManager, fruit: ParsedFruitData)
     func didFailWithError(error: Error)
 }
 
@@ -23,12 +23,9 @@ public struct FruitManager {
     }
     
     func performRequest(with urlString: String) {
-        //1. create url
         if let url = URL(string: urlString){
-            //2. create url session
             let session = URLSession.shared
-            
-            //3. give session task
+
             let task = session.dataTask(with: url) { (data, response, error) in
                 if error != nil {
                     self.delegate?.didFailWithError(error: error!)
@@ -40,7 +37,6 @@ public struct FruitManager {
                     }
                 }
             }
-            //4. start task
             task.resume()
         } else {
             print("Malformed URL.")
@@ -48,7 +44,7 @@ public struct FruitManager {
     }
     
     
-    func parseJSON(fruitData: Data) -> FruitModel? {
+    func parseJSON(fruitData: Data) -> ParsedFruitData? {
         let decoder = JSONDecoder()
         do {
             let decodedData = try decoder.decode(FruitData.self, from: fruitData)
@@ -59,8 +55,8 @@ public struct FruitManager {
             let fat = decodedData.nutritions.fat
             let calories = decodedData.nutritions.calories
             let sugar = decodedData.nutritions.sugar
-            let fruitModel = FruitModel(name: name, family: family, carbohydrates: carbohydrates, protein: protein, fat: fat, calories: calories, sugar: sugar)
-            return fruitModel
+            let fruitFacts = ParsedFruitData(name: name, family: family, carbohydrates: carbohydrates, protein: protein, fat: fat, calories: calories, sugar: sugar)
+            return fruitFacts
         } catch {
             delegate?.didFailWithError(error: error)
             return nil

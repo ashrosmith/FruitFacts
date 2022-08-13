@@ -92,7 +92,7 @@ class FruitDataViewController: UIViewController {
 
 extension FruitDataViewController: FruitManagerDelegate {
     
-    func didUpdateFruit(_fruitManager: FruitManager, fruit: FruitModel) {
+    func didUpdateFruit(_fruitManager: FruitManager, fruit: ParsedFruitData) {
         DispatchQueue.main.async {
             self.fruitNameLabel.text = String(fruit.name)
             self.fruitCaloriesLabel.text = "Calories: \(fruit.calories)"

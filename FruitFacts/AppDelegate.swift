@@ -14,6 +14,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+//        let rootViewController = self.window!.rootViewController as! FruitViewController
+//        rootViewController.context = self.managedObjectContext
         return true
     }
 

@@ -1,13 +1,13 @@
 //
-//  FruitModel.swift
+//  ParsedFruitData.swift
 //  FruitFacts
 //
-//  Created by Ashley Smith on 8/3/22.
+//  Created by Ashley Smith on 8/13/22.
 //
 
 import Foundation
 
-public struct FruitModel {
+public struct ParsedFruitData {
     let name: String
     let family: String
     let carbohydrates: Double

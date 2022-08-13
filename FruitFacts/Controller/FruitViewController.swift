@@ -10,8 +10,9 @@ import CoreData
 
 class FruitViewController: UIViewController {
 
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    var fruit = [Fruit]()
+    var fetchedResultsController: NSFetchedResultsController<Fruit>!
+  
+    let context = CoreDataManager.shared.persistentContainer.viewContext
     var safeArea: UILayoutGuide!
     let tableView = UITableView()
     var button = UIButton()
@@ -24,6 +25,7 @@ class FruitViewController: UIViewController {
         label.font = UIFont.boldSystemFont(ofSize: 20.0)
         return label
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(tableView)
@@ -38,6 +40,7 @@ class FruitViewController: UIViewController {
             image.alpha = 0.4
         tableView.rowHeight = 80.0
         
+
         loadFruit()
     }
     
@@ -46,7 +49,7 @@ class FruitViewController: UIViewController {
         tableView.frame = CGRect(x: 0, y: 100, width: view.frame.width, height: view.frame.height - 100)
       }
  
- //MARK: - Button functions
+ //MARK: - Button Functions
     
     func addButton() {
         button = UIButton(configuration: .filled())
@@ -62,10 +65,7 @@ class FruitViewController: UIViewController {
         let alert = UIAlertController(title: "Add New Fruit", message: "", preferredStyle: .alert)
         let addAction = UIAlertAction(title: "Add Fruit", style: .default) { (action) in
             if let entry = textField.text {
-                let newFruit = Fruit(context: self.context)
-                newFruit.name = entry
-                self.fruit.append(newFruit)
-                self.saveFruit()
+                CoreDataManager.shared.createFruit(name: entry)
             }
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
@@ -80,48 +80,46 @@ class FruitViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
- //MARK: - Core Data
-    
-    func saveFruit(){
-        do {
-            try context.save()
-            
-        } catch {
-            print("Error saving new fruit, \(error).")
-        }
-        tableView.reloadData()
-    }
+ //MARK: - Load Fruit Method
 
     func loadFruit(){
-        let request : NSFetchRequest<Fruit> = Fruit.fetchRequest()
-        do {
-            fruit = try context.fetch(request)
-           
-        } catch {
-            print("Error loading recipe data, \(error).")
+        if fetchedResultsController == nil {
+            let request = NSFetchRequest<Fruit>(entityName: "Fruit")
+            let sort = NSSortDescriptor(key: "name", ascending: false)
+                        request.sortDescriptors = [sort]
+                        request.fetchBatchSize = 20
+            fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+            fetchedResultsController.delegate = self
         }
         
-        tableView.reloadData()
+        do {
+            try fetchedResultsController.performFetch()
+            tableView.reloadData()
+        } catch let err {
+            print(err)
+        }
     }
 }
 
-//MARK: - UI Table View Data Source
+//MARK: - UITableView Data Source
 
 extension FruitViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fruit.count
+        let sectionInfo = fetchedResultsController.sections![section]
+        return sectionInfo.numberOfObjects
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "fruitCell", for: indexPath)
+        let fruit = fetchedResultsController.object(at: indexPath)
         cell.backgroundColor = UIColor.clear
-        cell.textLabel?.text = fruit[indexPath.row].name
+        cell.textLabel?.text = fruit.name
         return cell
         
     }
 }
 
-//MARK: - UI Table View Delegate
+//MARK: - UITableView Delegate
 
 extension FruitViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -133,10 +131,41 @@ extension FruitViewController: UITableViewDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     
     let destinationVC = segue.destination as! FruitDataViewController
-        if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.fruitName = fruit[indexPath.row].name ?? "No fruit found."
+      if let indexPath = tableView.indexPathForSelectedRow {
+          let fruit = fetchedResultsController.object(at: indexPath)
+            destinationVC.fruitName = fruit.name ?? "No fruit found."
             }
         }
+ 
+}
+
+//MARK: - NSFetchedResults Delegate
+extension FruitViewController: NSFetchedResultsControllerDelegate {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return fetchedResultsController.sections?.count ?? 0
     }
 
-
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.beginUpdates() // a
+    }
+          
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .insert:
+            tableView.insertRows(at: [newIndexPath!], with: .fade) // b
+        case .delete:
+            tableView.deleteRows(at: [indexPath!], with: .fade)
+        case .update:
+            tableView.reloadRows(at: [indexPath!], with: .fade)
+        case .move:
+            tableView.moveRow(at: indexPath!, to: newIndexPath!)
+        default:
+            break
+        }
+    }
+     
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.endUpdates() // c
+    }
+}
